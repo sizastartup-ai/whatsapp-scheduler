@@ -120,13 +120,16 @@ cron.schedule('* * * * *', async () => {
             item.readyAt = new Date().toISOString();
             changed = true;
 
-            // Send WhatsApp message reminder
-            try {
-                const timeStr = new Date(item.scheduledTime).toLocaleString();
-                await waClient.sendReminder('254731811933', item.mediaPath, item.caption, timeStr, item.type);
-                console.log('✅ WhatsApp reminder sent to 254731811933');
-            } catch (err) {
-                console.error('❌ Failed to send WhatsApp reminder:', err.message);
+            // Send WhatsApp message reminders
+            const reminderNumbers = ['254731811933', '254711467109'];
+            for (const num of reminderNumbers) {
+                try {
+                    const timeStr = new Date(item.scheduledTime).toLocaleString();
+                    await waClient.sendReminder(num, item.mediaPath, item.caption, timeStr, item.type);
+                    console.log(`✅ WhatsApp reminder sent to ${num}`);
+                } catch (err) {
+                    console.error(`❌ Failed to send WhatsApp reminder to ${num}:`, err.message);
+                }
             }
         }
     }
