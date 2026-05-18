@@ -6,8 +6,10 @@ import path from 'path';
 import fs from 'fs';
 import cron from 'node-cron';
 import QRCode from 'qrcode';
+import sharp from 'sharp';
 import { waClient } from './whatsapp.js';
 import { JSONFilePreset } from 'lowdb/node';
+
 
 import { fileURLToPath } from 'url';
 
@@ -55,6 +57,29 @@ app.get('/api/wa-status', async (req, res) => {
 app.post('/api/schedule', upload.single('media'), async (req, res) => {
     const { caption, scheduledTime, type } = req.body;
     const mediaPath = req.file ? req.file.path : null;
+    let thumbnailPath = mediaPath;
+
+    if (mediaPath && (type === 'image' || !type)) {
+        try {
+            const dir = path.dirname(mediaPath);
+            const ext = path.extname(mediaPath);
+            const base = path.basename(mediaPath, ext);
+            const thumbName = `thumb-${base}${ext}`;
+            const thumbPath = path.join(dir, thumbName);
+
+            // Resize the image to max 400px width/height while keeping aspect ratio and auto-rotating based on EXIF orientation
+            await sharp(mediaPath)
+                .rotate()
+                .resize({ width: 400, height: 400, fit: 'inside', withoutEnlargement: true })
+                .toFile(thumbPath);
+
+            thumbnailPath = thumbPath;
+            console.log(`📸 Created thumbnail: ${thumbnailPath}`);
+        } catch (error) {
+            console.error('⚠️ Failed to generate thumbnail:', error);
+            // Fallback: thumbnailPath remains mediaPath
+        }
+    }
 
     const newSchedule = {
         id: uuidv4(),
@@ -62,6 +87,7 @@ app.post('/api/schedule', upload.single('media'), async (req, res) => {
         scheduledTime,
         type: type || 'image',
         mediaPath,
+        thumbnailPath,
         status: 'pending',
         createdAt: new Date().toISOString()
     };
@@ -80,9 +106,12 @@ app.delete('/api/schedule/:id', async (req, res) => {
     const { id } = req.params;
     const schedule = db.data.schedules.find(s => s.id === id);
     
-    if (schedule && schedule.mediaPath) {
-        if (fs.existsSync(schedule.mediaPath)) {
+    if (schedule) {
+        if (schedule.mediaPath && fs.existsSync(schedule.mediaPath)) {
             fs.unlinkSync(schedule.mediaPath);
+        }
+        if (schedule.thumbnailPath && schedule.thumbnailPath !== schedule.mediaPath && fs.existsSync(schedule.thumbnailPath)) {
+            fs.unlinkSync(schedule.thumbnailPath);
         }
     }
 

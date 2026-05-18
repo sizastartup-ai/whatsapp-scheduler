@@ -188,7 +188,7 @@ export default function App() {
               <div key={item.id} className="card card--ready">
                 <div className="card__media">
                   {item.type === 'image'
-                    ? <img src={getMediaUrl(item.mediaPath)} alt="" className="card__img" />
+                    ? <img src={getMediaUrl(item.thumbnailPath || item.mediaPath)} alt="" className="card__img" />
                     : <video src={getMediaUrl(item.mediaPath)} className="card__img" muted autoPlay loop />
                   }
                   <div className="card__badge card__badge--ready">⏰ Post Now</div>
@@ -342,7 +342,7 @@ export default function App() {
                 <div key={item.id} className="card" style={{ animationDelay: `${i * 0.05}s` }}>
                   <div className="card__media">
                     {item.type === 'image'
-                      ? <img src={getMediaUrl(item.mediaPath)} alt="" className="card__img" />
+                      ? <img src={getMediaUrl(item.thumbnailPath || item.mediaPath)} alt="" className="card__img" />
                       : <video src={getMediaUrl(item.mediaPath)} className="card__img" muted loop />
                     }
                     <div className={`card__badge ${
