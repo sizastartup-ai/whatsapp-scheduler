@@ -19,16 +19,21 @@ const port = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
-app.use('/uploads', express.static('uploads'));
+// Ensure persistent data directories exist
+if (!fs.existsSync('data/uploads')) {
+    fs.mkdirSync('data/uploads', { recursive: true });
+}
+
+app.use('/uploads', express.static('data/uploads'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // DB Setup
 const defaultData = { schedules: [] };
-const db = await JSONFilePreset('db.json', defaultData);
+const db = await JSONFilePreset('data/db.json', defaultData);
 
 // Multer Setup
 const storage = multer.diskStorage({
-    destination: 'uploads/',
+    destination: 'data/uploads/',
     filename: (req, file, cb) => {
         cb(null, `${uuidv4()}${path.extname(file.originalname)}`);
     }

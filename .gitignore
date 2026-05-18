@@ -2,16 +2,15 @@
 node_modules/
 **/node_modules/
 
-# WhatsApp Auth Session info (CRITICAL: Do not commit keys/sessions!)
+# Persistent data folder (CRITICAL: Contains database, WhatsApp sessions, and uploads!)
+server/data/
+**/server/data/
+
+# Legacy stateful folders (safety ignores)
 auth_info/
 **/auth_info/
-
-# Local database
 server/db.json
-
-# Uploaded files
 server/uploads/*
-!server/uploads/.gitkeep
 
 # Production builds
 dist/

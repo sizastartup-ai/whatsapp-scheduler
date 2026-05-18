@@ -10,7 +10,7 @@ class WhatsAppClient extends EventEmitter {
         this.sock = null;
         this.qr = null;
         this.isConnected = false;
-        this.authDir = path.resolve('auth_info');
+        this.authDir = path.resolve('data/auth_info');
     }
 
     async init() {
