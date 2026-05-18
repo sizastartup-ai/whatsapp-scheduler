@@ -10,6 +10,15 @@ import { format, formatDistanceToNow } from 'date-fns';
 const SERVER_BASE = import.meta.env.DEV ? 'http://localhost:5000' : '';
 const API_BASE = `${SERVER_BASE}/api`;
 
+const getMediaUrl = (mediaPath) => {
+  if (!mediaPath) return '';
+  const normalized = mediaPath.replace(/\\/g, '/');
+  const webPath = normalized.startsWith('data/uploads/') 
+    ? normalized.replace('data/uploads/', 'uploads/') 
+    : normalized;
+  return `${SERVER_BASE}/${webPath}`;
+};
+
 // Request browser notification permission
 const requestNotifPermission = async () => {
   if ('Notification' in window && Notification.permission === 'default') {
@@ -178,8 +187,8 @@ export default function App() {
               <div key={item.id} className="card card--ready">
                 <div className="card__media">
                   {item.type === 'image'
-                    ? <img src={`${SERVER_BASE}/${item.mediaPath}`} alt="" className="card__img" />
-                    : <video src={`${SERVER_BASE}/${item.mediaPath}`} className="card__img" muted autoPlay loop />
+                    ? <img src={getMediaUrl(item.mediaPath)} alt="" className="card__img" />
+                    : <video src={getMediaUrl(item.mediaPath)} className="card__img" muted autoPlay loop />
                   }
                   <div className="card__badge card__badge--ready">⏰ Post Now</div>
                 </div>
@@ -188,7 +197,7 @@ export default function App() {
                   <div className="card__actions">
                     {/* Download button */}
                     <a
-                      href={`${SERVER_BASE}/${item.mediaPath}`}
+                      href={getMediaUrl(item.mediaPath)}
                       download
                       className="btn btn--download"
                     >
@@ -332,8 +341,8 @@ export default function App() {
                 <div key={item.id} className="card" style={{ animationDelay: `${i * 0.05}s` }}>
                   <div className="card__media">
                     {item.type === 'image'
-                      ? <img src={`${SERVER_BASE}/${item.mediaPath}`} alt="" className="card__img" />
-                      : <video src={`${SERVER_BASE}/${item.mediaPath}`} className="card__img" muted loop />
+                      ? <img src={getMediaUrl(item.mediaPath)} alt="" className="card__img" />
+                      : <video src={getMediaUrl(item.mediaPath)} className="card__img" muted loop />
                     }
                     <div className={`card__badge ${
                       item.status === 'posted' ? 'card__badge--posted' :
