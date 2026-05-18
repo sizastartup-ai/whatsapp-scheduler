@@ -88,7 +88,8 @@ export default function App() {
     setLoading(true);
     const data = new FormData();
     data.append('caption', formData.caption);
-    data.append('scheduledTime', formData.scheduledTime);
+    const isoTime = new Date(formData.scheduledTime).toISOString();
+    data.append('scheduledTime', isoTime);
     data.append('type', formData.type);
     data.append('media', formData.media);
     try {
