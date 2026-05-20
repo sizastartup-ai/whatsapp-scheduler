@@ -96,8 +96,11 @@ export default function App() {
       await axios.post(`${API_BASE}/schedule`, data);
       setFormData({ caption: '', scheduledTime: '', type: 'image', media: null });
       fetchSchedules();
-    } catch { alert('Failed to schedule'); }
-    finally { setLoading(false); }
+    } catch (error) {
+      console.error('Error scheduling:', error);
+      const errorMsg = error.response?.data?.error || error.response?.statusText || error.message || 'Unknown error';
+      alert(`Failed to schedule: ${errorMsg}`);
+    } finally { setLoading(false); }
   };
 
   const deleteSchedule = async (id) => {
